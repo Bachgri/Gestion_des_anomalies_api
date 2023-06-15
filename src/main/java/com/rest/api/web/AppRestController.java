@@ -1,8 +1,12 @@
 package com.rest.api.web;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLConnection;
@@ -10,6 +14,7 @@ import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -22,9 +27,14 @@ import org.apache.catalina.filters.ExpiresFilter.XHttpServletResponse;
 import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.beans.factory.parsing.Problem;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,6 +47,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rest.api.Utils.Utils;
 import com.rest.api.entity.Client;
 import com.rest.api.entity.ClientRole;
 import com.rest.api.entity.Device;
@@ -61,8 +72,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(originPatterns = "http://*:4200")
-
+@CrossOrigin(originPatterns = "http://*:*")
 public class AppRestController {
 	
 	@Autowired
@@ -83,16 +93,16 @@ public class AppRestController {
 	ProductService prdserv;
 	
 	
-	@GetMapping("/clients") 
+	@GetMapping("/Api/clients") 
 	public List<Client> listClients(){
 		System.err.println(accs.listClients());
 		return accs.listClients();
 	}
-	@GetMapping("/client/{id}")
+	@GetMapping("/Api/client/{id}")
 	public Client getOne(@PathParam("id") Long id) {
 		return accs.getOne(id);
 	}
-	@PostMapping("/clients")
+	@PostMapping("/Api/clients")
 	public Client addClient(@RequestBody Client c) {
 		return accs.addClient(c);
 	}
@@ -232,6 +242,7 @@ public class AppRestController {
 	}
 	@PostMapping("/Api/reclamations")
 	public Reclamation postReclamation(@RequestBody Reclamation v){
+		System.out.println(v);
 		return recserv.post(v);
 	}
 	@PutMapping("/Api/reclamations")
@@ -249,58 +260,13 @@ public class AppRestController {
 
 	@PostMapping("/upload")
 	public String handleFileUpload(@RequestParam("file") MultipartFile file, @RequestParam("recid") String recid) throws Exception {
-		System.err.println("reclamation : "+recid);
-															
-	    String FTP_ADDRESS = "141.94.26.220";				
-	    String USER = "ubuntu";
-	    String PASSWORD = "root15963";
-	    FTPClient con = null;
-	    
-	    try {
-	    	System.err.println("----------------------------------------------------");
-	        con = new FTPClient();
-	        con.connect(FTP_ADDRESS, 21);
-	        System.out.println("reply code : " + con.getReplyString());
-	        System.err.println("------------------------ server : "+ con.getDefaultPort()  +"----------------------------");
-	        if (FTPReply.isPositiveCompletion(con.getReplyCode())) {
-	            System.out.println("Operation success. Server reply code: " + con.getReplyCode());
-	        }
-	        boolean connect = con.login(USER, PASSWORD);
-	        System.out.println("connected? : " + connect);
-	        if (connect) {
-	        	System.out.println("connected succefully");
-	            con.enterLocalPassiveMode(); // important!
-	            con.setFileType(FTP.BINARY_FILE_TYPE);
-	            //String[] t = file.getOriginalFilename().toString().split(".");
-	            String t = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.'));
-	            System.err.println(t + " : length "+ file.getOriginalFilename() + " : " + t);
-	            boolean result = con.storeFile("reclamation__"+recid + t, file.getInputStream());
-	            if (result) {
-	            	//HttpServletResponse response = null;
-	                System.out.println("You successfully uploaded " + result + "   "+ file.getOriginalFilename() + "!");
-	                con.logout();
-		            con.disconnect();
-	                return "You successfully uploaded";
-	            } else {
-	            	System.out.println("Could not upload " + file.getOriginalFilename() + "!");
-	            	con.logout();
-	            	con.disconnect();
-	            	return "Could not upload";
-	            }
-	            
-            	
-	        }else {
-	        	System.out.println("failed to connect");
-	        	return "failed to connect";
-	        }
-	    } catch (Exception e) {
-	    	System.err.println("----------------------------------------------------\n");
-	    	e.printStackTrace();
-	        System.err.println(e.getCause());
-	        return e.getMessage();
-	    }
-
+		return recserv.upload(file, recid);
 	}
+	
+	@GetMapping("/download/{recid}")
+	public ResponseEntity<byte[]> downloadFile(@PathVariable("recid") long recid) {
+        return recserv.download(recid);
+    }
 	
 	/********************				problems				**********************/
 	@GetMapping("/Api/problemes")
@@ -350,8 +316,9 @@ public class AppRestController {
 	
 	/************************ 		Other operations		 *************************/
 	@PostMapping("/addImgToRec")
-	public void addImgToRec(@RequestBody RoleUser roleUser) {
-		accs.addRolToUser(roleUser.getUsername(), roleUser.getRoleName());
+	public void addImgToRec(@RequestBody ImageRec imageRec) {
+		//accs.addRolToUser(roleUser.getUsername(), roleUser.getRoleName());
+		recserv.setRecImg(imageRec.getUserid(), imageRec.getImageUrl());
 	}
 	
 	

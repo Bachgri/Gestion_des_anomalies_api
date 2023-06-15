@@ -2,7 +2,9 @@ package com.rest.api.service;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.rest.api.entity.Reclamation;
 
@@ -13,4 +15,6 @@ public interface ReclamationService {
 	public Reclamation get(Long id);
 	public Reclamation delete(Long p);
 	public void setRecImg(long userid, String imageUrl);
+	public String upload(MultipartFile file, String recid);
+	public ResponseEntity<byte[]> download(long recid);
 }

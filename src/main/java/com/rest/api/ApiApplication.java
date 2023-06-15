@@ -9,14 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import com.rest.api.entity.Client;
-import com.rest.api.entity.ClientRole;
-import com.rest.api.entity.Fournisseur;
-import com.rest.api.reposiroty.ClientRepo;
-import com.rest.api.reposiroty.FournisseurRepo;
-import com.rest.api.service.AccountService;
-import com.rest.api.serviceImpl.AccountServiceImpl;
+import com.rest.api.service.AccountService; 
 
 @SpringBootApplication
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)

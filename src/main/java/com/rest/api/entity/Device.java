@@ -25,8 +25,9 @@ import javax.persistence.JoinColumn;
 @Data		
 @Table(name = "devices")
 public class Device {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	
+	@Id   
+	@GeneratedValue(strategy = GenerationType.IDENTITY) 
 	private Long id;
 	private String uniqueid;
 	private String name;
@@ -34,17 +35,17 @@ public class Device {
 	private boolean disabled;
 	private String capteurs;
 	private String vehicule;
-	private String immatriculation ;
+	private String immatriculation ; 
 	private String typeveh;
 	private String fonction;
 	@ManyToOne
 	private Ville ville;
-	@ManyToMany
+	/*@ManyToMany
     @JoinTable()
-    private List<Product> products;
+    private List<Product> products;*/
 	
 	public void copyTo(Device d){
-		 
+		
 		this.uniqueid = d.uniqueid;
 		this.name = d.name;
 		this.lastupdate = d.lastupdate;
@@ -52,11 +53,11 @@ public class Device {
 		this.capteurs = d.capteurs;
 		this.vehicule = d.vehicule;
 		this.immatriculation = d.immatriculation;
-		this.typeveh = d.typeveh;
-		this.fonction = d.fonction;
-		this.ville = d.ville;
-		this.products = d.products;
-	}
-
-	 
+		this.typeveh = d.typeveh;		
+		this.fonction = d.fonction;		
+		this.ville = d.ville;			
+		//this.products = d.products;	
+	}									
+		
+	 	
 }

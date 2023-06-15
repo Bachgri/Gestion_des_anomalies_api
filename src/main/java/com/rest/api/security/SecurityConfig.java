@@ -57,16 +57,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeHttpRequests().antMatchers("/login").permitAll();
 		http.authorizeHttpRequests().antMatchers("/roles").permitAll();
 		http.authorizeHttpRequests().antMatchers("/upload").permitAll();
+		http.authorizeHttpRequests().antMatchers("/download").permitAll();
 		http.authorizeHttpRequests().antMatchers("/Api/reclamations").permitAll();
 		http.authorizeHttpRequests().antMatchers("/Api/reclamations/**").permitAll();
+		http.authorizeHttpRequests().antMatchers("/Api/**/**").permitAll();
 		
 		//http.authorizeHttpRequests().antMatchers(HttpMethod.GET, "/clients").hasAnyAuthority("ADMIN", "USER");
-		http.authorizeHttpRequests().antMatchers(HttpMethod.GET, "/roles").hasAnyAuthority("ADMIN");
+		/*http.authorizeHttpRequests().antMatchers(HttpMethod.GET, "/roles").hasAnyAuthority("ADMIN");
 		http.authorizeHttpRequests().antMatchers(HttpMethod.GET, "/villes").hasAnyAuthority("USER", "ADMIN");
 		http.authorizeHttpRequests().antMatchers(HttpMethod.GET, "/villes/*").hasAnyAuthority("USER", "ADMIN");
 		http.authorizeHttpRequests().antMatchers(HttpMethod.POST, "/villes").hasAnyAuthority("ADMIN");
 		http.authorizeHttpRequests().antMatchers(HttpMethod.PUT, "/villes").hasAnyAuthority("ADMIN");
-		http.authorizeHttpRequests().antMatchers(HttpMethod.DELETE, "/villes").hasAnyAuthority("ADMIN");
+		http.authorizeHttpRequests().antMatchers(HttpMethod.DELETE, "/villes").hasAnyAuthority("ADMIN");*/
 		
 		/*http.authorizeHttpRequests().antMatchers(HttpMethod.GET,    "/reclamations").hasAnyAuthority(  "USER", "ADMIN");
 		http.authorizeHttpRequests().antMatchers(HttpMethod.GET,    "/reclamations/*").hasAnyAuthority("USER", "ADMIN");
